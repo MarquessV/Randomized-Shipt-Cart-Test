@@ -19,11 +19,11 @@ Install the dependencies:
 npm install
 ```
 
-Install and run selenium-standalone (redirecting its output so it doesn't clutter your current terminal):
+Install and run selenium-standalone
 
 ```
-./node_modules/.bin/selenium-standalone install
-./node_modules/.bin/selenium-standalone start > /dev/null 2>&1
+npm run selenium_install
+npm run selenium_start
 ```
 
 Create a credentials.json file formatted like so and save it to the projects root directory:
