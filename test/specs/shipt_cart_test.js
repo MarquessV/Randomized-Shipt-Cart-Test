@@ -33,10 +33,12 @@ function AddRandomProductToCart()
   browser.pause(500); // This short pause reduces the chance that the search total hasn't loaded yet
   // Get the total number search results
   var search_total = parseInt(browser.getText(search_total_selector));
-  if(isNaN(search_total)) { // If search total didn't load yet, we resort to selecting the first product (since it is the only one guaranteed to exist).
+  // If search total didn't load yet, we resort to selecting the first product (since it is the only one guaranteed to exist).
+  if(isNaN(search_total) || search_total == 0) { 
     console.log("Failed to generate a valid random number, selecting the first product instead.");
-    search_total = "1"; 
-  } else {
+    search_total = 1;
+    product_to_choose = "1"; 
+  } else {  // Otherwise we generate a random number in the range [1, search_total]
     console.log("Search total = " + search_total);
     // Generate a random number within the range of search results to use as the index for the product
     var product_to_choose = (Math.floor(Math.random() * search_total) + 1).toString();
@@ -46,16 +48,18 @@ function AddRandomProductToCart()
   // Create the xpath selector for the randomly selected product
   var product_selector = base_product_xpath + '/div[' + product_to_choose + ']';
   // Note: Because the products will overflow horizontally, this test will fail on thin (< 683px width in my case) resolutions. 
-  // You can use moveToObject with large offsets to mitigate this, but it still doesn't work everytime and fails on large resolutions.
+  // You can use moveToObject with large offsets to mitigate this, but it still doesn't work everytime even on large resolutions.
+  // Not to mention that its deprecated.
   // If the product item is further down the list, it probably isn't loaded yet so we scroll down the page until it is.
-  browser.keys('home'); // First we reset the view,
-  while(!browser.isExisting(product_selector + product_xpath_add_suffix)) {
-    browser.keys('End');  // Then scroll down to the end of the page to load new products
+  browser.keys('End');  // Start at the bottom to preemptively load more items.
+  var curr_item = 1;
+  while(curr_item <= search_total && !browser.isExisting(product_selector + product_xpath_add_suffix)) {
+    browser.scroll(product_selector + '/div[' + curr_item.toString() + ']');
+    curr_item++;
   }
-  // then, since we could've overshot the product, we move back to it until it is visible...
-  while(!browser.isVisible(product_selector + product_xpath_add_suffix)) {
-    browser.scroll(product_selector + product_xpath_add_suffix);
-  }
+  // Once the item exists, scroll to it and wait for it to be visible
+  browser.scroll(product_selector + product_xpath_add_suffix);
+  browser.waitForVisible(product_selector + product_xpath_add_suffix);
   // then add the product to the cart and return the product name.
   browser.click(product_selector + product_xpath_add_suffix);
   return browser.getText(product_selector + product_xpath_name_suffix);
@@ -161,9 +165,9 @@ describe('Shipt Cart Test', function() {
       cart_item = browser.getText(first_item_selector + 'p.product-name');
       console.log("Cart item: " + cart_item);
       expect(cart_item).to.equal(first_product_added, 'The product in the cart did not match');  // The product names to match and
-      product_total = browser.getText(first_item_selector + 'span.button.button-price.ng-binding');
-      console.log("Cart total: " + product_total);
-      expect(cart_total).to.equal("2", 'Two of the same items were added, but exactly two are not in the cart'); // the total of that product in the cart to be 2
+      product_count = browser.getText(first_item_selector + 'span.button.button-price.ng-binding');
+      console.log("Product count: " + product_count);
+      expect(product_count).to.equal("2", 'Two of the same items were added, but exactly two are not in the cart'); // the total of that product in the cart to be 2
     }
     else {  // Otherwise, we can check that the two items are correct by...
       second_item_selector = 'div.cart-items-area>div>div:nth-child(3) ';
