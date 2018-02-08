@@ -4,6 +4,8 @@
   "description": "A test for the Shipt website that uses the search and category functionality to add items to the cart and verify the correct items were added.",
   "main": "index.js",
   "scripts": {
+    "selenium_install": "selenium-standalone install",
+    "selenium_start": "selenium-standalone start",
     "test": "wdio wdio.conf.js"
   },
   "author": "Marquess Valdez",
@@ -12,6 +14,7 @@
     "chai": "^4.1.2",
     "chromedriver": "^2.35.0",
     "mocha": "^5.0.0",
+    "selenium-standalone": "^6.12.0",
     "webdriverio": "^4.10.2"
   },
   "devDependencies": {
