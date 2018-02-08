@@ -1,0 +1,8 @@
+{
+  "pages": {
+    "home":  "https://www.shipt.com",
+    "login": "https://shop.shipt.com/#/app/home",
+    "cart" : "https://shop.shipt.com/#/app/shoppingCart"
+  },
+  "search_term": "Tofu"
+}
