@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "selenium_install": "selenium-standalone install",
-    "selenium_start": "selenium-standalone start",
+    "selenium_start": "selenium-standalone start > /dev/null 2>&1 &",
     "test": "wdio wdio.conf.js"
   },
   "author": "Marquess Valdez",
